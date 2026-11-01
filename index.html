@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#23272C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>きのぴー、8時50分発。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== タイトル画面 ===== -->
+<section id="title" class="screen title">
+  <div class="sky" aria-hidden="true">
+    <svg class="plane" viewBox="0 0 120 40" width="120" height="40">
+      <path d="M8 22 L92 18 Q112 18 114 22 Q112 26 92 26 L8 24 Z" fill="#F4F5F6"/>
+      <path d="M50 21 L72 4 L80 4 L68 21 Z" fill="#E6E8EA"/>
+      <path d="M50 24 L70 36 L78 36 L66 24 Z" fill="#D5D9DD"/>
+      <path d="M10 22 L4 10 L12 10 L22 21 Z" fill="#C9332B"/>
+      <g fill="#8FA4C0"><rect x="84" y="20" width="3" height="2"/><rect x="78" y="20" width="3" height="2"/><rect x="72" y="20" width="3" height="2"/><rect x="66" y="20" width="3" height="2"/><rect x="60" y="20" width="3" height="2"/><rect x="54" y="20" width="3" height="2"/><rect x="48" y="20" width="3" height="2"/><rect x="42" y="20" width="3" height="2"/><rect x="36" y="20" width="3" height="2"/><rect x="30" y="20" width="3" height="2"/></g>
+    </svg>
+    <div class="runway"></div>
+  </div>
+
+  <div class="depboard">
+    <div class="dep-head"><span>出発　Departures</span><span id="tclock">07:20</span></div>
+    <div id="dep" class="dep"></div>
+  </div>
+
+  <h1 class="ttl">
+    <span class="ttl-a">きのぴー、</span>
+    <span class="ttl-b" id="ttlFlap" aria-label="8時50分発。"></span>
+  </h1>
+  <p class="sub">成田空港で、なくしたパスポートをさがすゲーム</p>
+
+  <canvas id="tkino" class="tkino" aria-hidden="true"></canvas>
+
+  <div class="tmenu">
+    <button id="tStart" class="btn-main">はじめる</button>
+    <div class="tsub">
+      <button id="tCenter" class="btn-ghost">忘れ物センター</button>
+      <button id="tCloset" class="btn-ghost">きのぴーの服</button>
+    </div>
+    <button id="tHow" class="btn-ghost">遊び方</button>
+  </div>
+  <p class="tbest" id="tbest"></p>
+  <p class="tnote">音が出ます</p>
+</section>
+
+<!-- ===== 登場シーン ===== -->
+<section id="scene" class="screen scene" hidden>
+  <canvas id="scv"></canvas>
+  <div class="dialog" id="dialog">
+    <div class="speaker" id="speaker"></div>
+    <p id="dtext"></p>
+    <span class="dnext" id="dnext">▼</span>
+  </div>
+  <button id="skip" class="skip">スキップ</button>
+</section>
+
+<!-- ===== ゲーム画面 ===== -->
+<div id="app" hidden>
+  <header class="hud">
+    <div class="hud-top">
+      <div class="clock"><span class="lbl">いま</span><b id="clock">07:20</b></div>
+      <div class="flight">
+        <span class="fno">KP 850 台北（桃園）行き</span>
+        <span class="fdep">8:50 発</span>
+      </div>
+      <span id="fstatus" class="chip">搭乗手続中</span>
+      <button id="bSound" class="iconbtn">音あり</button>
+    </div>
+    <div class="hud-bottom">
+      <div class="floor"><b id="floorNo">4F</b><span id="floorTitle">出発ロビー</span></div>
+      <div class="hp"><span class="lbl">体力</span><span class="bar" id="hpbar"><i id="hpfill"></i></span><b id="hp">40/40</b></div>
+      <div class="lv"><span class="lbl">レベル</span><b id="lv">1</b></div>
+    </div>
+  </header>
+
+  <div id="goal" class="goal"></div>
+
+  <main id="stage">
+    <canvas id="cv" aria-label="空港の中"></canvas>
+    <canvas id="mini" aria-hidden="true"></canvas>
+    <ul id="log" aria-live="polite"></ul>
+  </main>
+
+  <footer class="pad">
+    <div class="dpad" aria-label="移動">
+      <button data-dir="-1,-1" aria-label="左上">↖</button>
+      <button data-dir="0,-1" aria-label="上">↑</button>
+      <button data-dir="1,-1" aria-label="右上">↗</button>
+      <button data-dir="-1,0" aria-label="左">←</button>
+      <button data-dir="0,0" class="mid" aria-label="その場で待つ">待つ</button>
+      <button data-dir="1,0" aria-label="右">→</button>
+      <button data-dir="-1,1" aria-label="左下">↙</button>
+      <button data-dir="0,1" aria-label="下">↓</button>
+      <button data-dir="1,1" aria-label="右下">↘</button>
+    </div>
+    <div class="side">
+      <button id="bAction" class="action">その場で待つ</button>
+      <div class="side-row">
+        <button id="bInv" class="sbtn">持ち物 <span id="invCount">2</span></button>
+        <button id="bMap" class="sbtn">地図</button>
+      </div>
+      <!-- 右下はNetlifyのバッジと重なるので空けておく -->
+      <div class="badge-space" aria-hidden="true"></div>
+    </div>
+  </footer>
+  <p class="keys">移動：矢印キー／WASD　斜め：Q E Z C　決定（エレベーターなど）：Enter　待つ：Space　持ち物：I　地図：M　画面クリックでその場所まで歩きます</p>
+</div>
+
+<!-- ===== シート（持ち物・エレベーター・結果など） ===== -->
+<div id="modal" class="modal" hidden>
+  <div id="sheet" class="sheet" role="dialog" aria-modal="true"></div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
